@@ -4,7 +4,7 @@
   "name": "Testly: Ferramenta de Teste A/B Grátis",
   "colors": {
     "primary": "#007BFF",
-    "light": "#E8F0FA",
+    "light": "#007BFF",
     "dark": "#007BFF"
   },
   "favicon": "/favicon.svg",
