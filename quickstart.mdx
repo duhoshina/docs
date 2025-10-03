@@ -1,80 +1,450 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: "Guia Rápido de Implementação"
+description: "Implemente testes A/B em seu site usando nosso SDK plug-and-play"
 ---
 
-## Get started in three steps
+## Pré-requisitos
 
-Get your documentation site running locally and make your first customization.
-
-### Step 1: Set up your local environment
-
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
-
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
-
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 3: Go live
-
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
-
-## Next steps
-
-Now that you have your docs running, explore these key features:
+Antes de começar, você precisa ter:
 
 <CardGroup cols={2}>
+  <Card title="Conta Criada" icon="user-plus">
+    Uma conta criada na plataforma Testly
+  </Card>
+  <Card title="Experimento Configurado" icon="flask">
+    Um experimento criado no dashboard
+  </Card>
+  <Card title="API Key" icon="key">
+    Sua chave de API (encontrada no dashboard)
+  </Card>
+  <Card title="Experiment ID" icon="fingerprint">
+    O ID do experimento criado
+  </Card>
+</CardGroup>
 
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
+<Warning>
+  Você também precisará definir um **Element ID** único no seu HTML onde a variante será renderizada.
+</Warning>
 
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
+---
 
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
+## Implementação em HTML Puro
 
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
+### Passo 1: Adicione o elemento container
 
+Coloque uma `<div>` vazia onde você quer que a variante apareça:
+
+```html
+<div id="meu-botao-cta"></div>
+```
+
+### Passo 2: Adicione o script do SDK
+
+Adicione o script **`antes do fechamento da tag </body>`**:
+
+```html
+<script src="https://testly/flow.js?experimentId=SEU_EXPERIMENT_ID&elementId=meu-botao-cta&apiKey=SUA_API_KEY"></script>
+```
+
+### Exemplo completo
+
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Minha Landing Page</title>
+</head>
+<body>
+  <h1>Bem-vindo!</h1>
+  <p>Confira nossa oferta especial:</p>
+  
+  <!-- Container onde a variante será renderizada -->
+  <div id="meu-botao-cta"></div>
+
+  <!-- SDK Script -->
+  <script src="https://testly/flow.js?experimentId=0c644154-598b-4557-9e3c-a7706a9d1ab1&elementId=meu-botao-cta&apiKey=b4e46e6992744175dc521ac4b72f259afa648280d75938111e3d3910b6efa2df"></script>
+</body>
+</html>
+```
+
+<Tip>
+  Cole o script logo antes de `</body>` para garantir que todo o DOM esteja carregado antes da execução.
+</Tip>
+
+---
+
+## Implementação em React
+
+<Tabs>
+  <Tab title="Hook Personalizado (Recomendado)">
+    ### Criar hook reutilizável
+
+    ```jsx hooks/useABTest.js
+    import { useEffect } from 'react';
+    
+    export function useABTest(experimentId, elementId, apiKey, debug = false) {
+      useEffect(() => {
+        const script = document.createElement('script');
+        script.src = `https://testly/flow.js?experimentId=${experimentId}&elementId=${elementId}&apiKey=${apiKey}${debug ? '&debug=true' : ''}`;
+        script.async = true;
+        document.body.appendChild(script);
+    
+        return () => {
+          document.body.removeChild(script);
+        };
+      }, [experimentId, elementId, apiKey, debug]);
+    }
+    ```
+
+    ### Usar no componente
+
+    ```jsx components/CTAButton.jsx
+    import { useABTest } from '../hooks/useABTest';
+    
+    export function CTAButton() {
+      useABTest(
+        '0c644154-598b-4557-9e3c-a7706a9d1ab1', // experimentId
+        'submit-button',                          // elementId
+        'b4e46e6992744175dc521ac4b72f259afa648280d75938111e3d3910b6efa2df', // apiKey
+        true // debug (opcional)
+      );
+    
+      return <div id="submit-button"></div>;
+    }
+    ```
+  </Tab>
+  <Tab title="Componente Direto">
+    ```jsx components/CTAButton.jsx
+    import { useEffect } from 'react';
+    
+    export function CTAButton() {
+      useEffect(() => {
+        const elementId = 'submit-button';
+        const experimentId = '0c644154-598b-4557-9e3c-a7706a9d1ab1';
+        const apiKey = 'b4e46e6992744175dc521ac4b72f259afa648280d75938111e3d3910b6efa2df';
+    
+        const script = document.createElement('script');
+        script.src = `https://testly/flow.js?experimentId=${experimentId}&elementId=${elementId}&apiKey=${apiKey}&debug=true`;
+        script.async = true;
+        document.body.appendChild(script);
+    
+        return () => {
+          document.body.removeChild(script);
+        };
+      }, []);
+    
+      return <div id="submit-button"></div>;
+    }
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## Implementação via Google Tag Manager
+
+<Steps>
+  <Step title="Criar container no HTML">
+    Adicione o elemento onde a variante será renderizada:
+
+    ```html
+    <div id="meu-botao-cta"></div>
+    ```
+  </Step>
+  <Step title="Criar Tag no GTM">
+    1. Acesse seu **Google Tag Manager**
+    2. Clique em **Tags** → **Nova**
+    3. Configure a tag:
+
+    **Nome da Tag**: `A/B Test - Botão CTA`
+
+    **Tipo de Tag**: `HTML Personalizado`
+
+    **HTML**:
+
+    ```html
+    <script>
+    (function() {
+      var script = document.createElement('script');
+      script.src = 'https://testly/flow.js?experimentId=0c644154-598b-4557-9e3c-a7706a9d1ab1&elementId=meu-botao-cta&apiKey=b4e46e6992744175dc521ac4b72f259afa648280d75938111e3d3910b6efa2df';
+      script.async = true;
+      document.body.appendChild(script);
+    })();
+    </script>
+    ```
+
+    **Acionamento**:
+
+    - Escolha `DOM Ready` ou `Page View`
+    - Se quiser em páginas específicas, crie um acionador personalizado
+  </Step>
+  <Step title="Publicar">
+    1. Clique em **Salvar**
+    2. Clique em **Enviar** para publicar as alterações
+    3. Teste no modo de visualização antes de publicar
+  </Step>
+</Steps>
+
+<Accordion title="Usando variáveis GTM (avançado)">
+  Você pode usar variáveis do GTM para deixar mais dinâmico:
+
+  ```html
+  <script>
+  (function() {
+    var script = document.createElement('script');
+    script.src = 'https://testly/flow.js?experimentId={{Experiment ID}}&elementId={{Element ID}}&apiKey={{API Key}}';
+    script.async = true;
+    document.body.appendChild(script);
+  })();
+  </script>
+  ```
+
+  Crie variáveis constantes no GTM:
+
+  - `{{Experiment ID}}` = `0c644154-598b-4557-9e3c-a7706a9d1ab1`
+  - `{{Element ID}}` = `meu-botao-cta`
+  - `{{API Key}}` = `b4e46e6992744175dc521ac4b72f259afa648280d75938111e3d3910b6efa2df`
+</Accordion>
+
+---
+
+## Parâmetros do SDK
+
+| Parâmetro      | Obrigatório | Descrição                                            | Exemplo                                |
+| -------------- | ----------- | ---------------------------------------------------- | -------------------------------------- |
+| `experimentId` | ✅ Sim       | ID do experimento criado no dashboard                | `0c644154-598b-4557-9e3c-a7706a9d1ab1` |
+| `elementId`    | ✅ Sim       | ID do elemento HTML onde a variante será renderizada | `submit-button`                        |
+| `apiKey`       | ✅ Sim       | Sua chave de API (encontrada no dashboard)           | `b4e46e699274...`                      |
+| `debug`        | ❌ Não       | Ativa logs no console para debugging                 | `true` ou `false` (padrão: `false`)    |
+
+---
+
+## Como Funciona
+
+<AccordionGroup>
+  <Accordion title="Primeira visita" icon="eye">
+    - O SDK escolhe uma variante aleatoriamente
+    - Salva a escolha no `localStorage` do navegador
+    - Registra uma **impressão**
+    - Renderiza a variante no elemento especificado
+  </Accordion>
+  <Accordion title="Visitas seguintes" icon="rotate">
+    - O SDK carrega a mesma variante do `localStorage`
+    - Não registra nova impressão (evita duplicatas)
+    - Mantém consistência na experiência do usuário
+  </Accordion>
+  <Accordion title="Conversão" icon="check-circle">
+    - Quando o usuário clica no elemento renderizado
+    - O SDK registra uma **conversão**
+    - As métricas são atualizadas no dashboard
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Exemplo de Uso Completo
+
+Landing page com múltiplos testes A/B:
+
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Landing Page - Oferta Especial</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    .experiment-container {
+      margin: 2rem 0;
+      padding: 1rem;
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Oferta Imperdível! 🎉</h1>
+  
+  <p>Aproveite nossa promoção de lançamento com até 50% de desconto!</p>
+
+  <!-- Teste A/B: Headline -->
+  <div class="experiment-container">
+    <div id="headline-test"></div>
+  </div>
+
+  <!-- Teste A/B: CTA Principal -->
+  <div class="experiment-container">
+    <div id="cta-principal"></div>
+  </div>
+
+  <!-- Teste A/B: Garantia -->
+  <div class="experiment-container">
+    <div id="garantia-test"></div>
+  </div>
+
+  <!-- SDK Scripts -->
+  <script src="https://testly/flow.js?experimentId=EXPERIMENT_1&elementId=headline-test&apiKey=SUA_API_KEY"></script>
+  <script src="https://testly/flow.js?experimentId=EXPERIMENT_2&elementId=cta-principal&apiKey=SUA_API_KEY"></script>
+  <script src="https://testly/flow.js?experimentId=EXPERIMENT_3&elementId=garantia-test&apiKey=SUA_API_KEY"></script>
+</body>
+</html>
+```
+
+<Note>
+  Você pode executar múltiplos experimentos na mesma página! Apenas certifique-se de usar IDs únicos para cada container.
+</Note>
+
+---
+
+## Debug e Troubleshooting
+
+### Ativar modo debug
+
+Adicione `&debug=true` ao final da URL do script:
+
+```html
+<script src="https://testly/flow.js?experimentId=...&debug=true"></script>
+```
+
+### Logs no console
+
+Você verá informações detalhadas:
+
+```
+[Experiment SDK] userId 60516e02-bb73-469c-9043-fafa305f7a30
+[Experiment SDK] Dados recebidos da API: {...}
+[Experiment SDK] Variante selecionada: {id: "...", name: "Variant A"}
+[Experiment SDK] Script renderizado no container
+[Experiment SDK] Evento registrado impression e00326a7...
+```
+
+### Problemas comuns
+
+<AccordionGroup>
+  <Accordion title="Nada aparece no elemento" icon="circle-xmark">
+    Verifique se o `elementId` está correto e se o elemento existe no HTML antes do script ser executado.
+  </Accordion>
+  <Accordion title="Erro de CORS" icon="shield-halved">
+    Certifique-se de usar a versão mais recente do SDK (CORS já está configurado no servidor).
+  </Accordion>
+  <Accordion title="Variante não muda" icon="arrows-rotate">
+    O SDK usa `localStorage` para manter consistência. Limpe o cache ou use navegação anônima para testar diferentes variantes.
+  </Accordion>
+  <Accordion title="Conversões não registram" icon="mouse-pointer">
+    Verifique se o elemento clicável está dentro da variante renderizada pelo SDK.
+  </Accordion>
+</AccordionGroup>
+
+### Limpar cache local
+
+Para testar diferentes variantes, abra o console e execute:
+
+```javascript
+// Limpar TODOS os dados do experimento
+localStorage.clear();
+
+// Ou limpar um experimento específico
+localStorage.removeItem('experiment-SEU_EXPERIMENT_ID-variation');
+localStorage.removeItem('experiment-SEU_EXPERIMENT_ID-user-id');
+localStorage.removeItem('experiment-SEU_EXPERIMENT_ID-impression-VARIANT_ID');
+```
+
+---
+
+## Segurança
+
+<CardGroup cols={2}>
+  <Card title="API Keys Únicas" icon="key">
+    Cada API Key é única por usuário
+  </Card>
+  <Card title="Isolamento de Dados" icon="lock">
+    Usuários só acessam seus próprios experimentos
+  </Card>
+  <Card title="Validação Server-Side" icon="server">
+    Variantes são validadas no servidor
+  </Card>
+  <Card title="CORS Configurado" icon="globe">
+    Permite qualquer origem (seguro via API Key)
+  </Card>
+</CardGroup>
+
+---
+
+## Boas Práticas
+
+<AccordionGroup>
+  <Accordion title="Teste apenas UMA variável por vez" icon="bullseye">
+    ❌ **Não teste**: cor do botão + texto + posição ao mesmo tempo
+
+    ✅ **Teste**: apenas a cor do botão
+
+    Isso garante que você saiba exatamente qual mudança impactou os resultados.
+  </Accordion>
+  <Accordion title="Aguarde significância estatística" icon="chart-line">
+    - Mínimo de 100-200 conversões por variante
+    - Aguarde pelo menos 1-2 semanas de teste
+    - Use calculadoras de significância estatística
+
+    Decisões precipitadas podem levar a conclusões erradas.
+  </Accordion>
+  <Accordion title="Documente seus testes" icon="clipboard">
+    - Anote hipóteses antes do teste
+    - Registre os resultados
+    - Compartilhe learnings com o time
+
+    A documentação ajuda a construir conhecimento ao longo do tempo.
+  </Accordion>
+  <Accordion title="Não mude variantes durante o teste" icon="ban">
+    - Pode invalidar os resultados
+    - Se precisar mudar, crie um novo experimento
+
+    Alterações durante o teste podem comprometer a validade estatística.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Próximos Passos
+
+<CardGroup cols={2}>
+  <Card title="Implementar o SDK" icon="code" href="#">
+    Adicione o script no seu site
+  </Card>
+  <Card title="Criar Variantes" icon="wand-magic-sparkles" href="#">
+    Desenvolva variantes criativas no dashboard
+  </Card>
+  <Card title="Monitorar Resultados" icon="chart-mixed" href="#">
+    Acompanhe métricas em tempo real
+  </Card>
+  <Card title="Iterar e Otimizar" icon="rocket" href="#">
+    Melhore baseado nos dados coletados
+  </Card>
+</CardGroup>
+
+---
+
+## Suporte
+
+Precisa de ajuda? Entre em contato:
+
+<CardGroup cols={3}>
+  <Card title="Email" icon="envelope" href="mailto:support@testly.com">
+    [support@testly.com](mailto:support@testly.com)
+  </Card>
+  <Card title="Chat ao Vivo" icon="comments" href="#">
+    Disponível no dashboard
+  </Card>
+  <Card title="Documentação" icon="book" href="https://docs.testly.com">
+    docs.testly.com
+  </Card>
 </CardGroup>
 
 <Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
+  **Versão**: 1.0.0 | **Última atualização**: Outubro 2025
 </Note>
