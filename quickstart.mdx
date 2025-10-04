@@ -1,5 +1,5 @@
 ---
-title: "Guia Rápido de Implementação"
+title: "Guia Rápido"
 description: "Implemente testes A/B em seu site usando nosso SDK plug-and-play"
 ---
 
@@ -43,7 +43,7 @@ Coloque uma `<div>` vazia onde você quer que a variante apareça:
 Adicione o script **`antes do fechamento da tag </body>`**:
 
 ```html
-<script src="https://testly/flow.js?experimentId=SEU_EXPERIMENT_ID&elementId=meu-botao-cta&apiKey=SUA_API_KEY"></script>
+<script src="https://testly.com.br/flow.js?experimentId=SEU_EXPERIMENT_ID&elementId=meu-botao-cta&apiKey=SUA_API_KEY"></script>
 ```
 
 ### Exemplo completo
@@ -63,7 +63,7 @@ Adicione o script **`antes do fechamento da tag </body>`**:
   <div id="meu-botao-cta"></div>
 
   <!-- SDK Script -->
-  <script src="https://testly/flow.js?experimentId=0c644154-598b-4557-9e3c-a7706a9d1ab1&elementId=meu-botao-cta&apiKey=b4e46e6992744175dc521ac4b72f259afa648280d75938111e3d3910b6efa2df"></script>
+  <script src="https://testly.com.br/flow.js?experimentId=0c644154-598b-4557-9e3c-a7706a9d1ab1&elementId=meu-botao-cta&apiKey=b4e46e6992744175dc521ac4b72f259afa648280d75938111e3d3910b6efa2df"></script>
 </body>
 </html>
 ```
@@ -86,7 +86,7 @@ Adicione o script **`antes do fechamento da tag </body>`**:
     export function useABTest(experimentId, elementId, apiKey, debug = false) {
       useEffect(() => {
         const script = document.createElement('script');
-        script.src = `https://testly/flow.js?experimentId=${experimentId}&elementId=${elementId}&apiKey=${apiKey}${debug ? '&debug=true' : ''}`;
+        script.src = `https://testly.com.br/flow.js?experimentId=${experimentId}&elementId=${elementId}&apiKey=${apiKey}${debug ? '&debug=true' : ''}`;
         script.async = true;
         document.body.appendChild(script);
     
@@ -125,7 +125,7 @@ Adicione o script **`antes do fechamento da tag </body>`**:
         const apiKey = 'b4e46e6992744175dc521ac4b72f259afa648280d75938111e3d3910b6efa2df';
     
         const script = document.createElement('script');
-        script.src = `https://testly/flow.js?experimentId=${experimentId}&elementId=${elementId}&apiKey=${apiKey}&debug=true`;
+        script.src = `https://testly.com.br/flow.js?experimentId=${experimentId}&elementId=${elementId}&apiKey=${apiKey}&debug=true`;
         script.async = true;
         document.body.appendChild(script);
     
@@ -167,7 +167,7 @@ Adicione o script **`antes do fechamento da tag </body>`**:
     <script>
     (function() {
       var script = document.createElement('script');
-      script.src = 'https://testly/flow.js?experimentId=0c644154-598b-4557-9e3c-a7706a9d1ab1&elementId=meu-botao-cta&apiKey=b4e46e6992744175dc521ac4b72f259afa648280d75938111e3d3910b6efa2df';
+      script.src = 'https://testly.com.br/flow.js?experimentId=0c644154-598b-4557-9e3c-a7706a9d1ab1&elementId=meu-botao-cta&apiKey=b4e46e6992744175dc521ac4b72f259afa648280d75938111e3d3910b6efa2df';
       script.async = true;
       document.body.appendChild(script);
     })();
@@ -193,7 +193,7 @@ Adicione o script **`antes do fechamento da tag </body>`**:
   <script>
   (function() {
     var script = document.createElement('script');
-    script.src = 'https://testly/flow.js?experimentId={{Experiment ID}}&elementId={{Element ID}}&apiKey={{API Key}}';
+    script.src = 'https://testly.com.br/flow.js?experimentId={{Experiment ID}}&elementId={{Element ID}}&apiKey={{API Key}}';
     script.async = true;
     document.body.appendChild(script);
   })();
@@ -289,9 +289,9 @@ Landing page com múltiplos testes A/B:
   </div>
 
   <!-- SDK Scripts -->
-  <script src="https://testly/flow.js?experimentId=EXPERIMENT_1&elementId=headline-test&apiKey=SUA_API_KEY"></script>
-  <script src="https://testly/flow.js?experimentId=EXPERIMENT_2&elementId=cta-principal&apiKey=SUA_API_KEY"></script>
-  <script src="https://testly/flow.js?experimentId=EXPERIMENT_3&elementId=garantia-test&apiKey=SUA_API_KEY"></script>
+  <script src="https://testly.com.br/flow.js?experimentId=EXPERIMENT_1&elementId=headline-test&apiKey=SUA_API_KEY"></script>
+  <script src="https://testly.com.br/flow.js?experimentId=EXPERIMENT_2&elementId=cta-principal&apiKey=SUA_API_KEY"></script>
+  <script src="https://testly.com.br/flow.js?experimentId=EXPERIMENT_3&elementId=garantia-test&apiKey=SUA_API_KEY"></script>
 </body>
 </html>
 ```
@@ -336,7 +336,7 @@ Você verá informações detalhadas:
   <Accordion title="Variante não muda" icon="arrows-rotate">
     O SDK usa `localStorage` para manter consistência. Limpe o cache ou use navegação anônima para testar diferentes variantes.
   </Accordion>
-  <Accordion title="Conversões não registram" icon="mouse-pointer">
+  <Accordion title="Conversões não registram" icon="hand-pointer">
     Verifique se o elemento clicável está dentro da variante renderizada pelo SDK.
   </Accordion>
 </AccordionGroup>
@@ -435,13 +435,13 @@ Precisa de ajuda? Entre em contato:
 
 <CardGroup cols={3}>
   <Card title="Email" icon="envelope" href="mailto:support@testly.com">
-    [support@testly.com](mailto:support@testly.com)
+    [support@testly.com.br](mailto:support@testly.com.br)
   </Card>
   <Card title="Chat ao Vivo" icon="comments" href="#">
     Disponível no dashboard
   </Card>
   <Card title="Documentação" icon="book" href="https://docs.testly.com">
-    docs.testly.com
+    docs.testly.com.br
   </Card>
 </CardGroup>
 
